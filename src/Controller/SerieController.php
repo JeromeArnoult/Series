@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Serie;
+use App\Form\SerieType;
 use App\Repository\SerieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 
 class SerieController extends AbstractController
 {
@@ -31,14 +31,34 @@ class SerieController extends AbstractController
     }
 
     #[Route('/series/create', name: 'serie_create')]
-    public function create (Request $request): Response
+    public function create (
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response
     {
-        dump($request);
-        return $this->render('serie/create.html.twig');
+        $serie = new Serie();
+        //Pour ajouter la date de création de la serie automatiquement à la création
+        $serie->setDateCreated(new \DateTime());
+        $serieForm = $this->createForm(SerieType::class, $serie);
+
+        $serieForm->handleRequest($request);
+
+        if ($serieForm ->isSubmitted() && $serieForm->isValid()) {
+            //Pour "persister" les données en base de données
+            $entityManager->persist($serie);
+            $entityManager->flush();
+
+            $this->addFlash('success','Serie added! Good job.');
+            return $this->redirectToRoute('serie_details',['id' => $serie->getId()]);
+        }
+
+        return $this->render('serie/create.html.twig', [
+            'serieForm' => $serieForm->createView()
+        ]);
     }
 
     #[Route('/series/demo', name: 'serie_em-demo')]
-    //Inserer les données en base, on declare l'entityManager en argument
+    //Classe de demo pour inserer des données en base a partir de la function, on declare l'entityManager en argument
     public function demo (EntityManagerInterface $entityManager): Response
     {
         //Création de l'instance de l'entité

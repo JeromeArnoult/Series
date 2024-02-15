@@ -2,7 +2,15 @@
 
 {% block body %}
    <div>
-       {# afficher le formulaire de creation #}
+    {{form_start(serieForm)}}
+
+       {{ form_widget(serieForm) }}
+
+       <button>Create !</button>
+
+
+
+       {{ form_end(serieForm) }}
    </div>
 
 {% endblock %}
