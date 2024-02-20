@@ -27,6 +27,10 @@ class SerieController extends AbstractController
     {
         $serie = $serieRepository->find($id);
 
+        if(!$serie) {
+            throw $this->createNotFoundException('oh no!!!');
+        }
+
         return $this->render('serie/details.html.twig',["serie" => $serie]);
     }
 
@@ -52,8 +56,7 @@ class SerieController extends AbstractController
             return $this->redirectToRoute('serie_details',['id' => $serie->getId()]);
         }
 
-        return $this->render('serie/create.html.twig', [
-            'serieForm' => $serieForm->createView()
+        return $this->render('serie/create.html.twig', ['serieForm' => $serieForm->createView()
         ]);
     }
 
@@ -92,5 +95,16 @@ class SerieController extends AbstractController
         $entityManager->remove($serie);
         $entityManager->flush();
         return $this->render('serie/demo.html.twig');
+    }
+
+
+    #[Route('series/delete/{id}', name: 'delete')]
+    public function delete(Serie $serie, EntityManagerInterface $entityManager) {
+
+        $entityManager->remove($serie);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('main_home');
+
     }
 }
