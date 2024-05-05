@@ -50,11 +50,11 @@ class SerieController extends AbstractController
         if ($serieForm ->isSubmitted() && $serieForm->isValid()) {
             //Pour "persister" les données en base de données
             $entityManager->persist($serie);
-            $entityManager->flush();
 
             $this->addFlash('success','Serie added! Good job.');
             return $this->redirectToRoute('serie_details',['id' => $serie->getId()]);
         }
+        $entityManager->flush();
 
         return $this->render('serie/create.html.twig', ['serieForm' => $serieForm->createView()
         ]);
